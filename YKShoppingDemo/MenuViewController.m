@@ -6,13 +6,13 @@
 //  Copyright © 2016年 YangKa. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "MenuViewController.h"
 #import "OrderCell.h"
 #import "ItemModel.h"
 #import "SelectedMenuVC.h"
 #import "CommonClass.h"
 
-@interface ViewController ()<UITableViewDelegate, UITableViewDataSource, OrderDelegate>{
+@interface MenuViewController ()<UITableViewDelegate, UITableViewDataSource, OrderDelegate>{
     NSArray *_titleArr;
     UITableView *_tableView;
     
@@ -22,6 +22,8 @@
     UILabel *_badgeLabel;
     UILabel *label;
     UIButton *commitBtn;
+    
+    SelectedMenuVC *shppingCarView;
 }
 @property (nonatomic, strong) NSMutableArray *itemArr;
 
@@ -31,17 +33,18 @@
 @property (nonatomic, assign) NSInteger totalCounts;
 @end
 
-@implementation ViewController
+@implementation MenuViewController
 
 - (void)initItemData{
     _itemArr = [CommonClass returnItemData];
-    _titleArr = @[@"类型一", @"类型二", @"类型三", @"类型四"];
+    _titleArr = @[@"好评榜", @"热销榜", @"现炒快餐", @"菜品：小炒类"];
     
     
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     _totalCounts = 0;
     _totalCost = 0;
@@ -110,7 +113,7 @@
 }
 
 - (void)initButtomView{
-    UIView *buttomView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-45, self.view.frame.size.width, 45)];
+    UIView *buttomView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-64-37-45, self.view.frame.size.width, 45)];
     buttomView.backgroundColor = [UIColor colorWithRed:46/255.0 green:46/255.0 blue:46/255.0 alpha:0.8];
     [self.view addSubview:buttomView];
     
@@ -130,6 +133,7 @@
     carLogImage = [[UIImageView alloc] initWithFrame:CGRectMake(2.5, 7.5, 30, 30)];
     carLogImage.image = [UIImage imageNamed:@"gouwuche"];
     carLogImage.userInteractionEnabled = YES;
+    carLogImage.tag = 0;
     [carLogImage addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showSelectedMenuList)]];
     [buttomView addSubview:carLogImage];
     
@@ -154,7 +158,7 @@
 
 #pragma mark -----------UITableView
 - (void)initScrollView{
-    _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.frame.size.height-45)];
+    _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 80, self.view.frame.size.height-64-37-45)];
     _scrollView.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
     _scrollView.showsHorizontalScrollIndicator = NO;
     _scrollView.showsVerticalScrollIndicator = NO;
@@ -166,12 +170,32 @@
 
 - (void)initMainMenuList{
     for (int i = 0; i<_titleArr.count; i++) {
-        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, i*40, 80, 40)];
+        UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0, i*60, 80, 59)];
         [btn setTitleColor:[UIColor colorWithWhite:0.2 alpha:1.0] forState:UIControlStateNormal];
         [btn setTitle:_titleArr[i] forState:UIControlStateNormal];
+        btn.titleLabel.font = [UIFont systemFontOfSize:14];
+        btn.titleLabel.numberOfLines = 0;
         btn.tag = i;
         [btn addTarget:self action:@selector(touchMenuButton:) forControlEvents:UIControlEventTouchUpInside];
         [_scrollView addSubview:btn];
+        
+         btn.titleEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10);
+        
+        if (i == 0) {
+            [btn setImage:[UIImage imageNamed:@"star_img"] forState:UIControlStateNormal];
+            btn.imageEdgeInsets = UIEdgeInsetsMake(20, 10, 20, 50);
+            btn.titleEdgeInsets = UIEdgeInsetsMake(0, -60, 0, 10);
+        }
+        
+        if (i == 1) {
+            [btn setImage:[UIImage imageNamed:@"hot_img"] forState:UIControlStateNormal];
+            btn.imageEdgeInsets = UIEdgeInsetsMake(20, 10, 20, 50);
+            btn.titleEdgeInsets = UIEdgeInsetsMake(0, -40, 0, 10);
+        }
+        
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 60*i+59, 80, 1)];
+        line.backgroundColor = [UIColor grayColor];
+        [_scrollView addSubview:line];
     }
     
     [self setHighlightAtindex:0];
@@ -195,7 +219,7 @@
 #pragma mark -----------UITableView
 - (void)initTableView{
 
-    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(80, 0, self.view.frame.size.width-80, self.view.frame.size.height-45)];
+    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(80, 0, self.view.frame.size.width-80, self.view.frame.size.height-64-37-45)];
     _tableView.delegate = self;
     _tableView.dataSource = self;
     _tableView.backgroundColor = [UIColor whiteColor];
@@ -365,11 +389,18 @@
 
 #pragma mark -----------show selected menu
 - (void)showSelectedMenuList{
-    if (self.childViewControllers.count == 0) {
-        if (_orderArr && _orderArr.count>0) {
-            SelectedMenuVC *popView = [[SelectedMenuVC alloc] init];
-            popView.menuArr = _orderArr;
-            [popView show];
+    
+    if (shppingCarView) {
+        [shppingCarView hidden];
+        shppingCarView = nil;
+    }else{
+        if (self.childViewControllers.count == 0) {
+            if (_orderArr && _orderArr.count>0) {
+                
+                shppingCarView = [[SelectedMenuVC alloc] init];
+                shppingCarView.menuArr = _orderArr;
+                [shppingCarView showInViewController:self];
+            }
         }
     }
 }

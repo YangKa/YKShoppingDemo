@@ -12,7 +12,7 @@
 
 @property (nonatomic , strong) NSMutableArray *menuArr;
 
+- (void)hidden;
 
-
-- (void)show;
+- (void)showInViewController:(UIViewController*)VC;
 @end

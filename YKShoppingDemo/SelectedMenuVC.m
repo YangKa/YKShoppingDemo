@@ -22,6 +22,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
+    self.view.clipsToBounds = YES;
     
     [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hidden)]];
 }
@@ -42,11 +43,9 @@
     }];
 }
 
-- (void)show{
+- (void)showInViewController:(UIViewController*)VC{
     [self initTableView];
     [self returHeader];
-    
-    UIViewController *VC = [self currentViewController];
     
     [VC addChildViewController:self];
     self.view.frame = CGRectMake(0, -45, VC.view.frame.size.width, VC.view.frame.size.height);
@@ -63,7 +62,7 @@
 
 - (void)returHeader{
     
-    header = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-30, self.view.frame.size.width, 30)];
+    header = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-30, self.view.frame.size.width, 0)];
     header.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:header];
     
@@ -123,7 +122,7 @@
         
         if (_menuArr.count>0) {
             
-            [_tableView reloadData];
+            [tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
             
             CGFloat height = _menuArr.count > 4 ? 4*35 : _menuArr.count*35;
             [UIView animateWithDuration:0.3 animations:^{
@@ -137,30 +136,6 @@
         
     };
     return cell;
-}
-
-- (UIViewController*)currentViewController{
-    NSArray *windows = [UIApplication sharedApplication].windows;
-    
-    UIWindow *keyWindow;
-    for (UIWindow *tempWin in windows) {
-        if (tempWin.windowLevel == UIWindowLevelNormal) {
-            keyWindow = tempWin;
-            break;
-        }
-    }
-    
-    UIViewController *resultVC;
-    UIView *mainView = keyWindow.subviews[0];
-    
-    if ([mainView.nextResponder isKindOfClass:[UIViewController class]]) {
-        resultVC = (UIViewController*)mainView.nextResponder;
-    }else{
-        resultVC = keyWindow.rootViewController;
-    }
-    
-    return resultVC;
-    
 }
 
 - (void)didReceiveMemoryWarning {
