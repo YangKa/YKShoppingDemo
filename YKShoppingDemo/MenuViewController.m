@@ -17,6 +17,7 @@
     UITableView *_tableView;
     
     UIScrollView *_scrollView;
+    UIImageView *_leftLine;
     
     UIImageView *carLogImage;
     UILabel *_badgeLabel;
@@ -185,18 +186,25 @@
             [btn setImage:[UIImage imageNamed:@"star_img"] forState:UIControlStateNormal];
             btn.imageEdgeInsets = UIEdgeInsetsMake(20, 10, 20, 50);
             btn.titleEdgeInsets = UIEdgeInsetsMake(0, -60, 0, 10);
+            
         }
         
         if (i == 1) {
             [btn setImage:[UIImage imageNamed:@"hot_img"] forState:UIControlStateNormal];
             btn.imageEdgeInsets = UIEdgeInsetsMake(20, 10, 20, 50);
             btn.titleEdgeInsets = UIEdgeInsetsMake(0, -40, 0, 10);
+            
         }
         
         UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, 60*i+59, 80, 1)];
         line.backgroundColor = [UIColor grayColor];
         [_scrollView addSubview:line];
     }
+    
+    
+    _leftLine = [[UIImageView alloc] init];
+    _leftLine.image = [UIImage imageNamed:@"leftLine"];
+    [_scrollView addSubview:_leftLine];
     
     [self setHighlightAtindex:0];
 }
@@ -210,6 +218,7 @@
         UIButton *btn = (UIButton*)obj;
         if (btn.tag == index) {
             btn.backgroundColor = _tableView.backgroundColor;
+            _leftLine.frame = CGRectMake(0, 60*index, 5, 60);
         }else{
             btn.backgroundColor = _scrollView.backgroundColor;
         }
